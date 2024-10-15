@@ -1,5 +1,11 @@
 #!/bin/bash
 
+
+#begin
+bash <(wget -qO- https://raw.githubusercontent.com/atedim/nstart/main/nstart.sh)
+#begin
+
+
 ###Testa ROOT###
 if [[ $EUID -ne 0 ]]; then
    echo "Rode o Script como ROOT" 
@@ -7,19 +13,25 @@ if [[ $EUID -ne 0 ]]; then
 fi
 ###Testa ROOT###
 
+###Cria Pasta Scripts###
+mkdir /etc/scripts
+cd /etc/scripts
+chmod -R 777 /etc/scripts
+###Cria Pasta Scripts###
+
 
 ###Testa primeira execução###
 if [ -d "/work" ] 
 then
     	clear
 	echo "Sistema ja esta Pronto, nada será alterado." 
-    	echo "Atualizando o Script Tools." 
+    	echo "Atualizando o Script NTools." 
 	cd /etc/scripts
 	DATA=`date +%d%m%Y` 
-	mv tools $DATA.tools.old
+	mv ntools $DATA.ntools.old
 	chmod u-x *.old
-	curl https://raw.githubusercontent.com/atedim/start/main/tools -o tools
-	chmod u+x tools
+	curl https://raw.githubusercontent.com/atedim/nstart/main/ntools -o ntools
+	chmod u+x ntools
 else
     echo "Sistema Limpo, Preparando Ambiente inicial."
 ###Testa primeira execução###
@@ -76,16 +88,11 @@ mkdir -p /work/rack/16{0..9}
 chmod -R 777 /work
 ###Cria Diretórios###
 
-
-###Desliga o Wifi e Bluetooth###
-rfkill block wifi && rfkill block bluetooth
-###Desliga o Wifi e Bluetooth###
-
-###Baixa Script Tools###
+###Baixa Script NTools###
 mkdir /etc/scripts
 cd /etc/scripts
-curl https://raw.githubusercontent.com/atedim/start/main/tools -o tools
-chmod u+x tools
+curl https://raw.githubusercontent.com/atedim/nstart/main/ntools -o ntools
+chmod u+x ntools
 ###Baixa Script Tools###
 
 ###Cria o nao.txt###
@@ -96,13 +103,13 @@ cd /etc/scripts/ && touch nao.txt
 chmod -R 777 /etc/scripts
 ###Ajusta permissao da pasta Scripts###
 
-###Executa o Script Tools###
-cd /etc/scripts/ && ./tools born
-###Executa o Script Tools###
+###Executa o Script NTools###
+cd /etc/scripts/ && ./ntools born
+###Executa o Script NTools###
 
 ###Tudo Pronto###
 echo "Sistema Ajustado."
-#echo "Reinicie o sistema e execute o script TOOLS."
+#echo "Reinicie o sistema e execute o script Ntools."
 ###Tudo Pronto###
 
 fi
