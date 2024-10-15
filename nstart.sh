@@ -2,7 +2,7 @@
 
 
 #begin
-#bash <(wget -qO- https://raw.githubusercontent.com/atedim/nstart/main/nstart.sh)
+#    bash <(wget -qO- https://raw.githubusercontent.com/atedim/nstart/main/nstart.sh)
 #begin
 
 

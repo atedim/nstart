@@ -1,0 +1,10 @@
+#######################Permitir root login SSH#######################
+sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+/etc/init.d/ssh restart
+
+#######################Permitir root login SSH#######################
+
+
+
+bash <(wget -qO- https://raw.githubusercontent.com/atedim/nstart/main/nstart.sh)
