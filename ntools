@@ -85,10 +85,10 @@ function q_up()
     f_hora
     cd /etc/scripts
     DATA=`date +%d%m%Y` 
-    mv tools $DATA.tools.old
+    mv ntools $DATA.tools.old
     chmod u-x *.old
     curl https://raw.githubusercontent.com/atedim/nstart/main/ntools -o ntools
-    chmod u+x tools
+    chmod u+x ntools
 }
 
 # Função para verificar e criar diretório, se necessario
@@ -229,7 +229,7 @@ case $1 in
         echo "off = Desmonta DISCOS LOCAIS"
         echo "info = Exibe Info do Sistema"
         echo "update = Atualiza TOTALMENTE o Sistema operacional e o Script"
-        echo "qup = Atualiza SOMENTE o Script TOOLS"
+        echo "qup = Atualiza SOMENTE o Script NTools"
         exit 1
     ;;
 esac
