@@ -25,6 +25,10 @@ bloco1="$D_1:$D_2:$D_3:$D_4"
 bloco2="$D_5:$D_5:$D_7:$D_8"
 bloco3=
 
+
+SAMBA='/etc/samba/smb.conf'
+
+
 #### Funções ####
 
 
