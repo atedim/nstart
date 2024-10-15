@@ -1,0 +1,235 @@
+#!/bin/bash
+
+####Váriáveis####
+RAIZ=/work
+GAVETA=/work/g
+D_1=/work/d/8pd1
+D_2=/work/d/8pd2
+D_3=/work/d/8pd3
+D_4=/work/d/8pd4
+D_5=/work/d/8pd5
+D_6=/work/d/8pd6
+D_7=/work/d/8pd7
+D_8=/work/d/8pd8
+
+# Novos destinos
+D_8PRETA1=/work/g/8preta1
+D_8PRETA2=/work/g/8preta2
+D_8PRETA3=/work/g/8preta3
+
+LIMITE=25G
+DATA=`date +%d%m%Y`
+
+# Definindo os blocos de discos
+bloco1="$D_1:$D_2:$D_3:$D_4"
+bloco2="$D_5:$D_5:$D_7:$D_8"
+bloco3=
+
+#### Funções ####
+
+
+function f_hora() {
+    ntpdate pool.ntp.org >> /dev/null
+}
+
+function f_perm() {
+    chmod -R 777 $RAIZ
+    chown root:root -R $GAVETA
+}
+
+function f_monta8() 
+{
+    mount -L 8pd1 $D_1
+    mount -L 8pd2 $D_2
+    mount -L 8pd3 $D_3
+    mount -L 8pd4 $D_4
+    mount -L 8pd5 $D_5
+    mount -L 8pd6 $D_6
+    mount -L 8pd7 $D_7
+    mount -L 8pd8 $D_8
+}
+
+
+function f_desmonta() {
+    cd /
+    umount -q /work/d/8pd[1-8]
+    umount -q /work/g/8preta[1-8]	
+}
+
+function f_junta8() 
+{
+    mergerfs -o defaults,allow_other,use_ino,category.create=mfs,moveonenospc=true,minfreespace=$LIMITE $D_1:$D_2:$D_3:$D_4:$D_5:$D_6:$D_7:$D_8 $D_8PRETA
+}
+
+function f_info() 
+{
+    clear
+    f_hora 
+    echo "Info do Dispositivo:"
+    echo "$(date +%d/%m/%Y-%T) UPTIME  $(uptime -p)"	
+    echo "$(hostname) @ IP = $(hostname -I)"	
+    echo "Status das Unidades:"
+    echo "Gaveta81 = $(mountpoint -q /work/g/8preta1 && echo "on com $(df -h /work/g/8preta1 --output=avail | tail -n1) disp" || echo "off")"
+    echo "Gaveta82 = $(mountpoint -q /work/g/8preta2 && echo "on com $(df -h /work/g/8preta2 --output=avail | tail -n1) disp" || echo "off")"
+    echo "Gaveta83 = $(mountpoint -q /work/g/8preta3 && echo "on com $(df -h /work/g/8preta3 --output=avail | tail -n1) disp" || echo "off")"
+}
+
+function f_up() 
+{
+    f_hora
+    apt update && apt upgrade -y && apt autoremove -y && apt clean
+}
+
+function q_up() 
+{
+    f_hora
+    cd /etc/scripts
+    DATA=`date +%d%m%Y` 
+    mv ntools $DATA.tools.old
+    chmod u-x *.old
+    curl https://raw.githubusercontent.com/atedim/nstart/main/ntools -o ntools
+    chmod u+x ntools
+}
+
+# Função para verificar e criar diretório, se necessario
+function f_verifica_dir() {
+    local dir=$1
+    if [ ! -d "$dir" ]; then
+        echo "Diretorio $dir nao existe, criando..."
+        mkdir -p $dir
+    fi
+}
+
+# Função para montar os blocos com os destinos apropriados
+function f_junta8() {
+    if [ -n "$bloco1" ]; then
+        f_verifica_dir "$D_8PRETA1"
+        echo "Montando Bloco 1: $bloco1 em $D_8PRETA1"
+        mergerfs -o defaults,allow_other,use_ino,category.create=mfs,moveonenospc=true,minfreespace=$LIMITE $bloco1 $D_8PRETA1
+    fi
+
+    if [ -n "$bloco2" ]; then
+        f_verifica_dir "$D_8PRETA2"
+        echo "Montando Bloco 2: $bloco2 em $D_8PRETA2"
+        mergerfs -o defaults,allow_other,use_ino,category.create=mfs,moveonenospc=true,minfreespace=$LIMITE $bloco2 $D_8PRETA2
+    fi
+
+    if [ -n "$bloco3" ]; then
+        f_verifica_dir "$D_8PRETA3"
+        echo "Montando bloco 3: $bloco3 em $D_8PRETA3"
+        mergerfs -o defaults,allow_other,use_ino,category.create=mfs,moveonenospc=true,minfreespace=$LIMITE $bloco3 $D_8PRETA3
+    fi
+}
+
+
+function f_samba() 
+{
+	cat > $SAMBA <<EOT 
+
+[global]
+workgroup = workgroup
+server role = standalone server
+security = user
+map to guest = Bad Password
+
+[8preta1]
+path = /work/g/8preta1
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+[8preta2]
+path = /work/g/8preta2
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+[8preta3]
+path = /work/g/8preta3
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+
+[disks]
+path = /work/d
+writable = yes
+browseable = no
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+[scripts]
+path = /etc/scripts
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+EOT
+}
+
+
+
+#### Funções ####
+
+case $1 in 
+	born)
+		echo -n  Configurando servicos ...
+		f_samba
+		echo Concluido.
+	;;
+
+
+    on)
+        echo "Montando DISCOS LOCAIS em JBOD ..."
+        f_desmonta
+        f_monta8
+        f_junta8
+        echo "Concluído."
+        f_info
+    ;;
+
+    off)
+        echo "Desmontando DISCOS LOCAIS ..."
+        f_perm
+	f_desmonta
+        echo "Concluído."
+        f_info
+    ;;
+
+    info)
+        f_info
+    ;;
+
+    update)
+        echo "Atualizando o Sistema Operacional Completo..."
+        f_up
+        q_up
+        echo "Atualização concluída."
+    ;;
+
+    qup)
+        echo "Atualizando SOMENTE o Script TOOLS..."
+        q_up
+        echo "Atualização do script concluída."
+    ;;
+
+    *)
+        clear
+        echo "NTools ver 0.0.0.1 15102024"
+        echo 
+        echo "on = Monta DISCOS LOCAIS em JBOD"
+        echo "off = Desmonta DISCOS LOCAIS"
+        echo "info = Exibe Info do Sistema"
+        echo "update = Atualiza TOTALMENTE o Sistema operacional e o Script"
+        echo "qup = Atualiza SOMENTE o Script NTools"
+        exit 1
+    ;;
+esac
