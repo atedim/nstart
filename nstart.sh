@@ -13,13 +13,6 @@ if [[ $EUID -ne 0 ]]; then
 fi
 ###Testa ROOT###
 
-###Cria Pasta Scripts###
-mkdir /etc/scripts
-cd /etc/scripts
-chmod -R 777 /etc/scripts
-###Cria Pasta Scripts###
-
-
 ###Testa primeira execução###
 if [ -d "/work" ] 
 then
