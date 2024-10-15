@@ -122,13 +122,71 @@ function f_junta8() {
 }
 
 
+function f_samba() 
+{
+	cat > $SAMBA <<EOT 
 
+[global]
+workgroup = workgroup
+server role = standalone server
+security = user
+map to guest = Bad Password
+
+[8preta1]
+path = /work/g/8preta1
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+[8preta2]
+path = /work/g/8preta2
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+[8preta3]
+path = /work/g/8preta3
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+
+[disks]
+path = /work/d
+writable = yes
+browseable = no
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+
+[scripts]
+path = /etc/scripts
+writable = yes
+browseable = yes
+guest ok = yes
+create mask = 0777
+directory mask = 0777
+EOT
+}
 
 
 
 #### Funções ####
 
 case $1 in 
+	born)
+		echo -n  Configurando servicos ...
+		f_samba
+		echo Concluido.
+	;;
+
+
     on)
         echo "Montando DISCOS LOCAIS em JBOD ..."
         f_desmonta
