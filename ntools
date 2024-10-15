@@ -87,7 +87,7 @@ function q_up()
     DATA=`date +%d%m%Y` 
     mv tools $DATA.tools.old
     chmod u-x *.old
-    curl https://raw.githubusercontent.com/atedim/start/main/tools -o tools
+    curl https://raw.githubusercontent.com/atedim/nstart/main/ntools -o ntools
     chmod u+x tools
 }
 
