@@ -22,7 +22,7 @@ DATA=`date +%d%m%Y`
 
 # Definindo os blocos de discos
 bloco1="$D_1:$D_2:$D_3:$D_4"
-bloco2="$D_5:$D_5:$D_7:$D_8"
+bloco2="$D_5:$D_6:$D_7:$D_8"
 bloco3=
 
 
