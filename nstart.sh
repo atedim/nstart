@@ -36,7 +36,7 @@ apt update && apt upgrade -y && apt autoremove -y && apt clean
 
 
 ###instala basicos###
-apt-get install ntpdate rcconf mc rsync cifs-utils samba mergerfs htop iptraf net-tools gdu etherwake curl screen -y
+apt-get install ntpdate rcconf mc rsync cifs-utils samba mergerfs htop iptraf parted net-tools gdu etherwake curl screen -y
 ###instala basicos###
 
 
