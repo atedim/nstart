@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#1to2_sync
+#09:46 19/12/2023
+# ver 0.01
+
+
+# Variáveis das localidades
+# sendo localidade 1 a origem dos dados e a localidade 2 o destino dos dados
+
+caminho1="/work/g/8preta1/Dados/"
+caminho2="/work/g/8preta2/Dados/"
+
+
+# Verificar se os pontos de montagem existem
+if [ ! -d "$caminho1" ] || [ ! -d "$caminho2" ]; then
+    echo "Os pontos de montagem não existem. Por favor, crie os pontos de montagem antes de prosseguir."
+    exit 1
+fi
+
+
+# Verificar o arquivo de controle
+# o arquivo de controle deve ficar no local que é a origem dos dados para certificar que a origem não foi corrompida por ramsonware
+# o arquivo deve ter o mesmo tipo de acesso e permissao dos arquivos compartilhados para que a detecçao de ataques seja bem sucedida
+arquivo_controle="$caminho1/controle.txt"
+conteudo_teste="estearquivonaofoialterado"
+md5_teste="4fb5aeb052fafcbefdafdaa374df3e44"
+
+
+if [ -e "$arquivo_controle" ]; then
+    conteudo_atual=$(cat "$arquivo_controle")
+    md5_atual=$(md5sum "$arquivo_controle" | awk '{print $1}')
+
+#    # Verificar conteúdo e MD5
+    if [ "$conteudo_atual" = "$conteudo_teste" ] && [ "$md5_atual" = "$md5_teste" ]; then
+        echo "Verificações de conteúdo e MD5 bem-sucedidas. Iniciando rsync..."
+
+        # Comando rsync
+       rsync -av --delete "$caminho1" "$caminho2"
+
+        echo "rsync concluído com sucesso."
+    else
+        echo "Verificações de conteúdo ou MD5 falharam."
+    fi
+else
+    echo "O arquivo de controle não existe."
+fi
+
